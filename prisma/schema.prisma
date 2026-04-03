@@ -1,13 +1,81 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
+// prisma/schema.prisma
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id            String   @id @default(cuid())
+  clerkId       String   @unique
+  email         String   @unique
+  name          String?
+  role          Role     @default(AFFILIATE)
+  avatar        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  products      Product[]
+  links         Link[]
+  salesAsAffiliate Sale[] @relation("AffiliateSales")
+  salesAsMerchant  Sale[] @relation("MerchantSales")
+}
+
+enum Role {
+  MERCHANT
+  AFFILIATE
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  merchantId      String
+  merchant        User     @relation(fields: [merchantId], references: [id])
+  name            String
+  price           Float
+  commissionRate  Float    // in percentage
+  imageUrl        String?
+  description     String?
+  originalUrl     String
+  isActive        Boolean  @default(true)
+  slug            String   @unique
+  createdAt       DateTime @default(now())
+
+  links           Link[]
+  sales           Sale[]
+}
+
+model Link {
+  id          String   @id @default(cuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  affiliateId String
+  affiliate   User     @relation(fields: [affiliateId], references: [id])
+  shortSlug   String   @unique
+  clicks      Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Sale {
+  id                String   @id @default(cuid())
+  productId         String
+  product           Product  @relation(fields: [productId], references: [id])
+  affiliateId       String
+  affiliate         User     @relation("AffiliateSales", fields: [affiliateId], references: [id])
+  merchantId        String
+  merchant          User     @relation("MerchantSales", fields: [merchantId], references: [id])
+  amount            Float
+  commissionAmount  Float
+  status            SaleStatus @default(PENDING)
+  saleDate          DateTime @default(now())
+  confirmedAt       DateTime?
+  createdAt         DateTime @default(now())
+}
+
+enum SaleStatus {
+  PENDING
+  CONFIRMED
+  PAID
+  CANCELLED
 }
