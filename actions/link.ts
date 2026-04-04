@@ -12,6 +12,12 @@ export async function generateLink(productId: string) {
     throw new Error("Only affiliates can generate links");
   }
 
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+  });
+
+  if (!product) throw new Error("Product not found");
+
   // Check if link already exists for this product + affiliate
   let existingLink = await prisma.link.findFirst({
     where: {
@@ -21,12 +27,6 @@ export async function generateLink(productId: string) {
   });
 
   if (!existingLink) {
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
-    });
-
-    if (!product) throw new Error("Product not found");
-
     const shortSlug = `${product.slug}-${user.id.slice(0, 8)}`;
 
     existingLink = await prisma.link.create({
@@ -42,6 +42,6 @@ export async function generateLink(productId: string) {
 
   return {
     shortLink,
-    originalLink: `${product?.originalUrl}?aff=${user.id}`,
+    originalLink: `${product.originalUrl}?aff=${user.id}`,
   };
 }
