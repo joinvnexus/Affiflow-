@@ -13,11 +13,29 @@ export async function getCurrentUser() {
     where: { clerkId: clerkUser.id },
   });
 
+  const email =
+    clerkUser.primaryEmailAddress?.emailAddress ||
+    clerkUser.emailAddresses[0]?.emailAddress ||
+    "";
+
+  if (!user && email) {
+    user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (user) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { clerkId: clerkUser.id },
+      });
+    }
+  }
+
   if (!user) {
     user = await prisma.user.create({
       data: {
         clerkId: clerkUser.id,
-        email: clerkUser.emailAddresses[0]?.emailAddress || "",
+        email,
         name: clerkUser.fullName || clerkUser.firstName || "User",
       },
     });

@@ -1,4 +1,4 @@
-// app/dashboard/merchant/products/page.tsx
+// app/(dashboard)/merchant/products/page.tsx
 import { getCurrentUser } from "@/lib/current-user";
 import { redirect } from "next/navigation";
 import { ProductList } from "@/components/dashboard/ProductList";

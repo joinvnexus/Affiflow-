@@ -28,7 +28,12 @@ export default function OnboardingPage() {
     setIsLoading(true);
     try {
       await setUserRole(role);
-      router.push("/dashboard");
+      // Redirect to correct dashboard based on role
+      if (role === "MERCHANT") {
+        router.push("/merchant");
+      } else {
+        router.push("/affiliate");
+      }
     } catch (error) {
       console.error("Error setting role:", error);
       setIsLoading(false);

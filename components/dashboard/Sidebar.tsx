@@ -23,18 +23,18 @@ interface SidebarProps {
 }
 
 const merchantMenu = [
-  { label: "Dashboard", href: "/dashboard/merchant", icon: LayoutDashboard },
-  { label: "My Products", href: "/dashboard/merchant/products", icon: ShoppingBag },
-  { label: "Sales", href: "/dashboard/merchant/sales", icon: TrendingUp },
-  { label: "Settings", href: "/dashboard/merchant/settings", icon: Settings },
+  { label: "Dashboard", href: "/merchant", icon: LayoutDashboard },
+  { label: "My Products", href: "/merchant/products", icon: ShoppingBag },
+  { label: "Sales", href: "/merchant/sales", icon: TrendingUp },
+  { label: "Settings", href: "/merchant/settings", icon: Settings },
 ];
 
 const affiliateMenu = [
-  { label: "Dashboard", href: "/dashboard/affiliate", icon: LayoutDashboard },
+  { label: "Dashboard", href: "/affiliate", icon: LayoutDashboard },
   { label: "Marketplace", href: "/marketplace", icon: ShoppingBag },
-  { label: "My Links", href: "/dashboard/affiliate/links", icon: LinkIcon },
-  { label: "Earnings", href: "/dashboard/affiliate/earnings", icon: TrendingUp },
-  { label: "Settings", href: "/dashboard/affiliate/settings", icon: Settings },
+  { label: "My Links", href: "/affiliate/links", icon: LinkIcon },
+  { label: "Earnings", href: "/affiliate/earnings", icon: TrendingUp },
+  { label: "Settings", href: "/affiliate/settings", icon: Settings },
 ];
 
 export function Sidebar({ user }: SidebarProps) {
