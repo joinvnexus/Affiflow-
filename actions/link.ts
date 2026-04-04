@@ -3,7 +3,7 @@
 
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+// import { revalidatePath } from "next/cache";
 
 export async function generateLink(productId: string) {
   const user = await getCurrentUser();

@@ -3,11 +3,16 @@ import { SignUp } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getCurrentUser } from "@/lib/current-user";
 
 export default async function SignUpPage() {
   const { userId } = await auth();
   
   if (userId) {
+    const user = await getCurrentUser();
+    if (!user?.role) {
+      redirect("/onboarding");
+    }
     redirect("/dashboard");
   }
   return (

@@ -1,7 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-// @ts-ignore: side-effect import for global CSS declarations may be missing
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 

@@ -6,7 +6,7 @@ export default async function AffiliateDashboard() {
   const user = await getCurrentUser();
 
   if (user?.role !== "AFFILIATE") {
-    redirect("/dashboard/merchant");
+    redirect("/onboarding");
   }
 
   return (

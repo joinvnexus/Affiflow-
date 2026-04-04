@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
@@ -14,8 +14,13 @@ export default function OnboardingPage() {
   const [selectedRole, setSelectedRole] = useState<"MERCHANT" | "AFFILIATE" | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (!userId) {
+      router.push("/sign-in");
+    }
+  }, [userId, router]);
+
   if (!userId) {
-    router.push("/sign-in");
     return null;
   }
 

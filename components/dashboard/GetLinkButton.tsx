@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Copy, QrCode } from "lucide-react";
+import { Copy } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -29,6 +29,7 @@ export function GetLinkButton({ productId, productName }: GetLinkButtonProps) {
       setLinkData(result);
       setIsOpen(true);
     } catch (error) {
+      console.error(error);
       alert("Failed to generate link. Please try again.");
     } finally {
       setIsLoading(false);

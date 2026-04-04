@@ -10,6 +10,10 @@ export default async function MarketplacePage() {
     redirect("/sign-in");
   }
 
+  if (!user.role) {
+    redirect("/onboarding");
+  }
+
   // Affiliate-দের জন্যই এই পেজ, Merchant-কে redirect করবো
   if (user.role === "MERCHANT") {
     redirect("/dashboard/merchant/products");

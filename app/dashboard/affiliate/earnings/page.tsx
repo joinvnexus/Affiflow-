@@ -7,7 +7,7 @@ export default async function EarningsPage() {
   const user = await getCurrentUser();
 
   if (user?.role !== "AFFILIATE") {
-    redirect("/dashboard/merchant");
+    redirect("/onboarding");
   }
 
   return (

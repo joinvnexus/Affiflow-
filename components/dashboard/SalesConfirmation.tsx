@@ -12,8 +12,15 @@ interface SalesConfirmationProps {
   merchantId: string;
 }
 
+interface ProductItem {
+  id: string;
+  name: string;
+  price: number;
+  commissionRate: number;
+}
+
 export function SalesConfirmation({ merchantId }: SalesConfirmationProps) {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<ProductItem[]>([]);
   const [selectedProduct, setSelectedProduct] = useState("");
   const [amount, setAmount] = useState("");
   const [affiliateId, setAffiliateId] = useState("");
@@ -22,7 +29,7 @@ export function SalesConfirmation({ merchantId }: SalesConfirmationProps) {
   useEffect(() => {
     fetch("/api/merchant/products")
       .then(res => res.json())
-      .then(data => setProducts(data));
+      .then((data: ProductItem[]) => setProducts(data));
   }, []);
 
   const handleConfirm = async () => {
@@ -45,6 +52,7 @@ export function SalesConfirmation({ merchantId }: SalesConfirmationProps) {
       setAffiliateId("");
       setSelectedProduct("");
     } catch (error) {
+      console.error(error);
       alert("Failed to confirm sale");
     } finally {
       setIsLoading(false);
@@ -63,9 +71,9 @@ export function SalesConfirmation({ merchantId }: SalesConfirmationProps) {
               className="w-full p-3 border rounded-lg mt-1"
             >
               <option value="">-- Select Product --</option>
-              {products.map((p: any) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} (৳{p.price} - {p.commissionRate}%)
+              {products.map((product) => (
+                <option key={product.id} value={product.id}>
+                  {product.name} (৳{product.price} - {product.commissionRate}%)
                 </option>
               ))}
             </select>

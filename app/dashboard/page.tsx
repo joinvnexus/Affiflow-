@@ -9,9 +9,13 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
 
+  if (!user.role) {
+    redirect("/onboarding");
+  }
+
   if (user.role === "MERCHANT") {
     redirect("/dashboard/merchant");
-  } else {
-    redirect("/dashboard/affiliate");
   }
+
+  redirect("/dashboard/affiliate");
 }

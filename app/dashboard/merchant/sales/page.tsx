@@ -7,7 +7,7 @@ export default async function MerchantSalesPage() {
   const user = await getCurrentUser();
 
   if (user?.role !== "MERCHANT") {
-    redirect("/dashboard/affiliate");
+    redirect("/onboarding");
   }
 
   return (

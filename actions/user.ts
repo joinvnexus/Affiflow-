@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 
 export async function setUserRole(role: "MERCHANT" | "AFFILIATE") {
   try {

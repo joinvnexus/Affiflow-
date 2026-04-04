@@ -47,6 +47,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
       onClose();
       window.location.reload(); // Refresh to show new product
     } catch (error) {
+      console.error(error);
       alert("Failed to add product. Please try again.");
     } finally {
       setIsLoading(false);

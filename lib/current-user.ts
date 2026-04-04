@@ -19,7 +19,6 @@ export async function getCurrentUser() {
         clerkId: clerkUser.id,
         email: clerkUser.emailAddresses[0]?.emailAddress || "",
         name: clerkUser.fullName || clerkUser.firstName || "User",
-        role: "AFFILIATE", // Default role
       },
     });
   }

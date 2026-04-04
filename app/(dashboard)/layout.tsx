@@ -14,6 +14,10 @@ export default async function DashboardLayout({
     redirect("/sign-in");
   }
 
+  if (!user.role) {
+    redirect("/onboarding");
+  }
+
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
       {/* Sidebar */}
