@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AffiFlow
 
-## Getting Started
+AffiFlow is a role-based affiliate marketing dashboard built with Next.js, Clerk, Prisma, and PostgreSQL. Merchants can publish products and confirm affiliate sales, while affiliates can browse the marketplace, generate referral links, and track commissions.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js 15 App Router
+- React 19
+- Clerk authentication
+- Prisma ORM
+- PostgreSQL
+- Tailwind CSS 4
+
+## Core Flows
+
+### Merchant
+
+- Sign up and complete onboarding as `MERCHANT`
+- Add products with price, commission rate, and destination URL
+- Review merchant-only product data from `/api/merchant/products`
+- Confirm affiliate sales and mark commissions as paid
+
+### Affiliate
+
+- Sign up and complete onboarding as `AFFILIATE`
+- Browse active offers in `/dashboard/marketplace`
+- Generate unique short referral links
+- Track clicks, conversions, and confirmed earnings
+
+### Shared
+
+- Clerk webhooks sync users into PostgreSQL
+- `/go/[slug]` tracks clicks and redirects to the original product URL
+- Dashboard routes redirect users based on their selected role
+
+## Project Structure
+
+```text
+app/
+  api/
+    merchant/products/      Merchant product API
+    webhooks/clerk/         Clerk webhook endpoint
+  dashboard/                Role-based dashboards
+  go/[slug]/                Referral redirect + click tracking
+actions/                    Server actions for links, products, sales, users
+components/dashboard/       Dashboard UI
+lib/                        Prisma, current user helpers, product helpers
+prisma/                     Prisma schema and migrations
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create `.env.local` and configure:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+CLERK_WEBHOOK_SECRET=
+DATABASE_URL=
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/onboarding
+```
 
-## Learn More
+Use [`.env.example`](e:\affiflow\.env.example) as the starting template.
 
-To learn more about Next.js, take a look at the following resources:
+## Local Development
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm install
+npx prisma generate
+npx prisma migrate deploy
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open `http://localhost:3000`.
 
-## Deploy on Vercel
+## Available Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `npm run dev` starts the development server
+- `npm run build` creates a production build
+- `npm run start` runs the production server
+- `npm run lint` runs ESLint
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Setup Guides
+
+- General local setup: [SETUP.md](e:\affiflow\SETUP.md)
+- Clerk auth setup: [AUTH_SETUP.md](e:\affiflow\AUTH_SETUP.md)
+- Auth implementation notes: [AUTHENTICATION_SETUP.md](e:\affiflow\AUTHENTICATION_SETUP.md)
