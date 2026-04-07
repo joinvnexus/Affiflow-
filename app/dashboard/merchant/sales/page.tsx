@@ -1,7 +1,7 @@
-// app/dashboard/merchant/sales/page.tsx
-import { getCurrentUser } from "@/lib/current-user";
 import { redirect } from "next/navigation";
 import { SalesConfirmation } from "@/components/dashboard/SalesConfirmation";
+import { MerchantSalesTable } from "@/components/dashboard/MerchantSalesTable";
+import { getCurrentUser } from "@/lib/current-user";
 
 export default async function MerchantSalesPage() {
   const user = await getCurrentUser();
@@ -13,11 +13,12 @@ export default async function MerchantSalesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Confirm Sales</h1>
-        <p className="text-gray-500">Enter sales that came through affiliate links</p>
+        <h1 className="text-3xl font-bold">Sales and payouts</h1>
+        <p className="text-gray-500">Confirm affiliate-driven sales and mark commissions as paid.</p>
       </div>
 
-      <SalesConfirmation merchantId={user.id} />
+      <SalesConfirmation />
+      <MerchantSalesTable merchantId={user.id} />
     </div>
   );
 }

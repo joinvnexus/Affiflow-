@@ -1,8 +1,7 @@
-// actions/product.ts
 "use server";
 
 import { getCurrentUser } from "@/lib/current-user";
-import { prisma } from "@/lib/prisma";
+import { createMerchantProduct, merchantProductInputSchema } from "@/lib/products";
 import { revalidatePath } from "next/cache";
 
 export async function addProduct(data: {
@@ -18,19 +17,9 @@ export async function addProduct(data: {
     throw new Error("Unauthorized");
   }
 
-  const slug = data.name.toLowerCase().replace(/[^a-z0-9]/g, "-") + "-" + Date.now().toString().slice(-6);
+  const parsedData = merchantProductInputSchema.parse(data);
 
-  await prisma.product.create({
-    data: {
-      merchantId: user.id,
-      name: data.name,
-      price: data.price,
-      commissionRate: data.commissionRate,
-      description: data.description,
-      originalUrl: data.originalUrl,
-      slug,
-    },
-  });
+  await createMerchantProduct(user.id, parsedData);
 
   revalidatePath("/dashboard/merchant/products");
 }

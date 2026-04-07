@@ -1,17 +1,24 @@
-// components/dashboard/ProductMarketplace.tsx
-import { prisma } from "@/lib/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-// import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { GetLinkButton } from "./GetLinkButton";
 import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { prisma } from "@/lib/prisma";
+import { GetLinkButton } from "./GetLinkButton";
+
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
 export async function ProductMarketplace() {
   const products = await prisma.product.findMany({
     where: { isActive: true },
     include: {
       merchant: {
-        select: { name: true, email: true }
-      }
+        select: { name: true, email: true },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -27,38 +34,41 @@ export async function ProductMarketplace() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
       {products.map((product) => (
         <Card key={product.id} className="overflow-hidden">
-          {product.imageUrl && (
+          {product.imageUrl ? (
             <Image
-              src={product.imageUrl} 
+              src={product.imageUrl}
               alt={product.name}
-              className="w-full h-48 object-cover"
+              width={1200}
+              height={800}
+              className="h-48 w-full object-cover"
             />
+          ) : (
+            <div className="flex h-48 items-center justify-center bg-gray-100 text-sm text-gray-500 dark:bg-gray-800">
+              No product image
+            </div>
           )}
-          
+
           <CardHeader>
             <CardTitle className="line-clamp-2">{product.name}</CardTitle>
-            <div className="flex gap-2 mt-2">
-              <Badge variant="default">৳{product.price}</Badge>
-              <Badge variant="secondary">{product.commissionRate}% Commission</Badge>
+            <div className="mt-2 flex gap-2">
+              <Badge>{formatCurrency(product.price)}</Badge>
+              <Badge variant="secondary">{product.commissionRate}% commission</Badge>
             </div>
           </CardHeader>
 
           <CardContent className="space-y-4">
-            <p className="text-sm text-gray-600 line-clamp-3">
-              {product.description}
+            <p className="line-clamp-3 text-sm text-gray-600 dark:text-gray-300">
+              {product.description || "No description provided."}
             </p>
 
             <div className="text-xs text-gray-500">
-              By: {product.merchant.name || product.merchant.email}
+              By {product.merchant.name || product.merchant.email}
             </div>
 
-            <GetLinkButton 
-              productId={product.id}
-              productName={product.name}
-            />
+            <GetLinkButton productId={product.id} productName={product.name} />
           </CardContent>
         </Card>
       ))}

@@ -1,38 +1,51 @@
-// components/dashboard/EarningsOverview.tsx
-import { prisma } from "@/lib/prisma";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { prisma } from "@/lib/prisma";
 
 interface EarningsOverviewProps {
   affiliateId: string;
 }
 
+function formatCurrency(amount: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
 export async function EarningsOverview({ affiliateId }: EarningsOverviewProps) {
   const sales = await prisma.sale.findMany({
-    where: { 
+    where: {
       affiliateId,
-      status: "CONFIRMED" 
+      status: {
+        in: ["PENDING", "CONFIRMED", "PAID"],
+      },
     },
     include: {
-      product: true,
+      product: {
+        select: { name: true },
+      },
     },
     orderBy: { saleDate: "desc" },
   });
 
-  const totalEarnings = sales.reduce((sum, sale) => sum + sale.commissionAmount, 0);
-  const pendingSales = await prisma.sale.count({
-    where: { 
-      affiliateId,
-      status: "PENDING" 
-    },
-  });
+  const pendingAmount = sales
+    .filter((sale) => sale.status === "PENDING")
+    .reduce((sum, sale) => sum + sale.commissionAmount, 0);
+  const confirmedAmount = sales
+    .filter((sale) => sale.status === "CONFIRMED")
+    .reduce((sum, sale) => sum + sale.commissionAmount, 0);
+  const paidAmount = sales
+    .filter((sale) => sale.status === "PAID")
+    .reduce((sum, sale) => sum + sale.commissionAmount, 0);
 
   if (sales.length === 0) {
     return (
       <Card>
         <CardContent className="py-16 text-center">
           <p className="text-2xl font-medium text-gray-400">No earnings yet</p>
-          <p className="text-gray-500 mt-3">Start promoting products to earn commission</p>
+          <p className="mt-3 text-gray-500">Start promoting products to earn commission.</p>
         </CardContent>
       </Card>
     );
@@ -40,68 +53,66 @@ export async function EarningsOverview({ affiliateId }: EarningsOverviewProps) {
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-gray-500">Total Earned</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">৳{totalEarnings.toFixed(0)}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-gray-500">Confirmed Sales</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">{sales.length}</p>
-          </CardContent>
-        </Card>
-
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm text-gray-500">Pending</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">{pendingSales}</p>
+            <p className="text-3xl font-bold">{formatCurrency(pendingAmount)}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm text-gray-500">Confirmed</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{formatCurrency(confirmedAmount)}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm text-gray-500">Paid</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold">{formatCurrency(paidAmount)}</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Earnings Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Earnings</CardTitle>
+          <CardTitle>Recent earnings</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-sm">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3">Product</th>
-                  <th className="text-left py-3">Amount</th>
-                  <th className="text-left py-3">Commission</th>
-                  <th className="text-left py-3">Status</th>
-                  <th className="text-left py-3">Date</th>
+                <tr className="border-b text-left">
+                  <th className="py-3">Product</th>
+                  <th className="py-3">Sale amount</th>
+                  <th className="py-3">Commission</th>
+                  <th className="py-3">Status</th>
+                  <th className="py-3">Date</th>
                 </tr>
               </thead>
               <tbody>
-                {sales.slice(0, 10).map((sale) => (
+                {sales.map((sale) => (
                   <tr key={sale.id} className="border-b last:border-0">
                     <td className="py-4 font-medium">{sale.product.name}</td>
-                    <td className="py-4">৳{sale.amount}</td>
+                    <td className="py-4">{formatCurrency(sale.amount)}</td>
                     <td className="py-4 font-medium text-green-600">
-                      ৳{sale.commissionAmount}
+                      {formatCurrency(sale.commissionAmount)}
                     </td>
                     <td className="py-4">
-                      <Badge variant={sale.status === "CONFIRMED" ? "default" : "secondary"}>
+                      <Badge variant={sale.status === "PAID" ? "default" : "secondary"}>
                         {sale.status}
                       </Badge>
                     </td>
-                    <td className="py-4 text-sm text-gray-500">
-                      {new Date(sale.saleDate).toLocaleDateString()}
+                    <td className="py-4 text-gray-500">
+                      {new Date(sale.saleDate).toLocaleDateString("en-US")}
                     </td>
                   </tr>
                 ))}

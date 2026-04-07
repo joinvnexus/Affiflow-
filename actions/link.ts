@@ -1,9 +1,31 @@
-// actions/link.ts
 "use server";
 
 import { getCurrentUser } from "@/lib/current-user";
 import { prisma } from "@/lib/prisma";
-// import { revalidatePath } from "next/cache";
+
+async function generateUniqueShortSlug(baseSlug: string) {
+  let attempt = 0;
+
+  while (true) {
+    const suffix = Math.random().toString(36).slice(2, 8);
+    const shortSlug = `${baseSlug}-${suffix}`;
+
+    const existingLink = await prisma.link.findUnique({
+      where: { shortSlug },
+      select: { id: true },
+    });
+
+    if (!existingLink) {
+      return shortSlug;
+    }
+
+    attempt += 1;
+
+    if (attempt > 10) {
+      throw new Error("Could not generate a unique referral slug");
+    }
+  }
+}
 
 export async function generateLink(productId: string) {
   const user = await getCurrentUser();
@@ -14,11 +36,18 @@ export async function generateLink(productId: string) {
 
   const product = await prisma.product.findUnique({
     where: { id: productId },
+    select: {
+      id: true,
+      slug: true,
+      originalUrl: true,
+      isActive: true,
+    },
   });
 
-  if (!product) throw new Error("Product not found");
+  if (!product || !product.isActive) {
+    throw new Error("Product not found or inactive");
+  }
 
-  // Check if link already exists for this product + affiliate
   let existingLink = await prisma.link.findFirst({
     where: {
       productId,
@@ -27,18 +56,17 @@ export async function generateLink(productId: string) {
   });
 
   if (!existingLink) {
-    const shortSlug = `${product.slug}-${user.id.slice(0, 8)}`;
-
     existingLink = await prisma.link.create({
       data: {
         productId,
         affiliateId: user.id,
-        shortSlug,
+        shortSlug: await generateUniqueShortSlug(product.slug),
       },
     });
   }
 
-  const shortLink = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/go/${existingLink.shortSlug}`;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const shortLink = `${appUrl}/go/${existingLink.shortSlug}`;
 
   return {
     shortLink,

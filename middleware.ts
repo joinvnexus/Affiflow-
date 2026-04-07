@@ -11,17 +11,9 @@ const isProtectedRoute = createRouteMatcher([
   "/sales(.*)",
 ]);
 
-const isPublicRoute = createRouteMatcher([
-  "/sign-up(.*)",
-  "/sign-in(.*)",
-  "/",
-]);
-
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
-  const isPublic = isPublicRoute(req);
 
-  // Redirect to sign-in if accessing protected route without userId
   if (isProtectedRoute(req) && !userId) {
     return NextResponse.redirect(new URL("/sign-in", req.url));
   }
@@ -30,9 +22,5 @@ export default clerkMiddleware(async (auth, req) => {
 });
 
 export const config = {
-  matcher: [
-    "/((?!.+\\.[\\w]+$|_next).*)",
-    "/",
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };

@@ -1,15 +1,15 @@
-// components/dashboard/Sidebar.tsx
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  ShoppingBag, 
-  Link as LinkIcon, 
-  TrendingUp, 
+import {
+  CircleDollarSign,
+  LayoutDashboard,
+  Link as LinkIcon,
+  LogOut,
   Settings,
-  LogOut 
+  ShoppingBag,
+  TrendingUp,
 } from "lucide-react";
 import { SignOutButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
@@ -23,18 +23,20 @@ interface SidebarProps {
 }
 
 const merchantMenu = [
-  { label: "Dashboard", href: "/merchant", icon: LayoutDashboard },
-  { label: "My Products", href: "/merchant/products", icon: ShoppingBag },
-  { label: "Sales", href: "/merchant/sales", icon: TrendingUp },
-  { label: "Settings", href: "/merchant/settings", icon: Settings },
+  { label: "Dashboard", href: "/dashboard/merchant", icon: LayoutDashboard },
+  { label: "My Products", href: "/dashboard/merchant/products", icon: ShoppingBag },
+  { label: "Sales", href: "/dashboard/merchant/sales", icon: TrendingUp },
+  { label: "Payouts", href: "/dashboard/payouts", icon: CircleDollarSign },
+  { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 const affiliateMenu = [
-  { label: "Dashboard", href: "/affiliate", icon: LayoutDashboard },
-  { label: "Marketplace", href: "/marketplace", icon: ShoppingBag },
-  { label: "My Links", href: "/affiliate/links", icon: LinkIcon },
-  { label: "Earnings", href: "/affiliate/earnings", icon: TrendingUp },
-  { label: "Settings", href: "/affiliate/settings", icon: Settings },
+  { label: "Dashboard", href: "/dashboard/affiliate", icon: LayoutDashboard },
+  { label: "Marketplace", href: "/dashboard/marketplace", icon: ShoppingBag },
+  { label: "My Links", href: "/dashboard/affiliate/links", icon: LinkIcon },
+  { label: "Earnings", href: "/dashboard/affiliate/earnings", icon: TrendingUp },
+  { label: "Payouts", href: "/dashboard/payouts", icon: CircleDollarSign },
+  { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export function Sidebar({ user }: SidebarProps) {
@@ -42,30 +44,30 @@ export function Sidebar({ user }: SidebarProps) {
   const menu = user.role === "MERCHANT" ? merchantMenu : affiliateMenu;
 
   return (
-    <div className="w-64 border-r bg-white dark:bg-gray-900 flex flex-col">
-      <div className="p-6 border-b">
+    <div className="flex w-64 flex-col border-r bg-white dark:bg-gray-900">
+      <div className="border-b p-6">
         <h2 className="text-2xl font-bold text-primary">AffiFlow</h2>
-        <p className="text-sm text-gray-500 mt-1">{user.name || user.email}</p>
+        <p className="mt-1 text-sm text-gray-500">{user.name || user.email}</p>
       </div>
 
       <nav className="flex-1 p-4">
         <ul className="space-y-1">
           {menu.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-            
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+
             return (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
-                    isActive 
-                      ? "bg-primary text-white" 
-                      : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    "flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-primary text-white"
+                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
                   )}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className="h-5 w-5" />
                   {item.label}
                 </Link>
               </li>
@@ -74,10 +76,10 @@ export function Sidebar({ user }: SidebarProps) {
         </ul>
       </nav>
 
-      <div className="p-4 border-t">
+      <div className="border-t p-4">
         <SignOutButton>
-          <button className="flex w-full items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg">
-            <LogOut className="w-5 h-5" />
+          <button className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950">
+            <LogOut className="h-5 w-5" />
             Sign Out
           </button>
         </SignOutButton>

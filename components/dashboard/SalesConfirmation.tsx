@@ -1,16 +1,11 @@
-// components/dashboard/SalesConfirmation.tsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
 import { confirmSale } from "@/actions/sale";
-
-interface SalesConfirmationProps {
-  merchantId: string;
-}
 
 interface ProductItem {
   id: string;
@@ -19,7 +14,7 @@ interface ProductItem {
   commissionRate: number;
 }
 
-export function SalesConfirmation({ merchantId }: SalesConfirmationProps) {
+export function SalesConfirmation() {
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [selectedProduct, setSelectedProduct] = useState("");
   const [amount, setAmount] = useState("");
@@ -27,8 +22,8 @@ export function SalesConfirmation({ merchantId }: SalesConfirmationProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetch("/api/merchant/products")
-      .then(res => res.json())
+    fetch("/api/merchant/products?activeOnly=true")
+      .then((res) => res.json())
       .then((data: ProductItem[]) => setProducts(data));
   }, []);
 
@@ -44,16 +39,15 @@ export function SalesConfirmation({ merchantId }: SalesConfirmationProps) {
         productId: selectedProduct,
         amount: parseFloat(amount),
         affiliateId,
-        merchantId,
       });
-      
-      alert("Sale confirmed successfully!");
+
+      alert("Sale confirmed successfully.");
       setAmount("");
       setAffiliateId("");
       setSelectedProduct("");
     } catch (error) {
       console.error(error);
-      alert("Failed to confirm sale");
+      alert("Failed to confirm sale.");
     } finally {
       setIsLoading(false);
     }
@@ -64,23 +58,23 @@ export function SalesConfirmation({ merchantId }: SalesConfirmationProps) {
       <CardContent className="pt-6">
         <div className="space-y-6">
           <div>
-            <Label>Select Product</Label>
-            <select 
+            <Label>Select product</Label>
+            <select
               value={selectedProduct}
               onChange={(e) => setSelectedProduct(e.target.value)}
-              className="w-full p-3 border rounded-lg mt-1"
+              className="mt-1 w-full rounded-lg border p-3"
             >
-              <option value="">-- Select Product --</option>
+              <option value="">-- Select product --</option>
               {products.map((product) => (
                 <option key={product.id} value={product.id}>
-                  {product.name} (৳{product.price} - {product.commissionRate}%)
+                  {product.name} ({product.price} - {product.commissionRate}%)
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <Label>Sale Amount (৳)</Label>
+            <Label>Sale amount</Label>
             <Input
               type="number"
               value={amount}
@@ -90,23 +84,19 @@ export function SalesConfirmation({ merchantId }: SalesConfirmationProps) {
           </div>
 
           <div>
-            <Label>Affiliate ID (from link)</Label>
+            <Label>Affiliate user ID</Label>
             <Input
               value={affiliateId}
               onChange={(e) => setAffiliateId(e.target.value)}
-              placeholder="user_2abc123xyz..."
+              placeholder="Paste the affiliate user ID"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Affiliate-এর Clerk User ID দাও (লিংকে ?aff=... থেকে পাবে)
+            <p className="mt-1 text-xs text-gray-500">
+              Use the affiliate user ID associated with the referral link that generated the sale.
             </p>
           </div>
 
-          <Button 
-            onClick={handleConfirm} 
-            className="w-full" 
-            disabled={isLoading}
-          >
-            {isLoading ? "Confirming Sale..." : "Confirm Sale & Credit Commission"}
+          <Button onClick={handleConfirm} className="w-full" disabled={isLoading}>
+            {isLoading ? "Confirming sale..." : "Confirm sale and credit commission"}
           </Button>
         </div>
       </CardContent>
