@@ -10,6 +10,7 @@ export async function addProduct(data: {
   commissionRate: number;
   description?: string;
   originalUrl: string;
+  imageUrl?: string;
 }) {
   const user = await getCurrentUser();
 
