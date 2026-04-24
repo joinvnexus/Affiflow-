@@ -2,6 +2,7 @@
 import { getCurrentUser } from "@/lib/current-user";
 import { redirect } from "next/navigation";
 import { ProductMarketplace } from "@/components/dashboard/ProductMarketplace";
+import { prisma } from "@/lib/prisma";
 
 export default async function MarketplacePage() {
   const user = await getCurrentUser();
@@ -14,10 +15,21 @@ export default async function MarketplacePage() {
     redirect("/onboarding");
   }
 
-  // Affiliate-দের জন্যই এই পেজ, Merchant-কে redirect করবো
+  // Merchant-দের জন্য এই পেজ না, তাই Merchant-কে redirect করবো
   if (user.role === "MERCHANT") {
     redirect("/dashboard/merchant/products");
   }
+
+  // Fetch products server-side
+  const products = await prisma.product.findMany({
+    where: { isActive: true },
+    include: {
+      merchant: {
+        select: { name: true, email: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
 
   return (
     <div className="space-y-6">
@@ -26,7 +38,7 @@ export default async function MarketplacePage() {
         <p className="text-gray-500">Browse products and start earning commission</p>
       </div>
 
-      <ProductMarketplace />
+      <ProductMarketplace products={products} />
     </div>
   );
 }

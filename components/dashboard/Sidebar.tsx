@@ -18,7 +18,7 @@ interface SidebarProps {
   user: {
     name: string | null;
     email: string;
-    role: string;
+    role: "MERCHANT" | "AFFILIATE" | null;
   };
 }
 

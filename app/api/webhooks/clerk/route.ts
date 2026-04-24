@@ -42,12 +42,20 @@ export async function POST(req: Request) {
     if (evt.type === "user.created") {
       const { id, email_addresses, first_name, last_name, image_url } =
         evt.data;
+      const ensuredEmail =
+        email_addresses[0]?.email_address || `clerk_${id}@noemail.local`;
 
-      // Create user in database
-      await prisma.user.create({
-        data: {
+      // Create (or reconcile) user in database
+      await prisma.user.upsert({
+        where: { clerkId: id },
+        create: {
           clerkId: id,
-          email: email_addresses[0]?.email_address || "",
+          email: ensuredEmail,
+          name: `${first_name || ""} ${last_name || ""}`.trim() || null,
+          avatar: image_url || null,
+        },
+        update: {
+          email: ensuredEmail,
           name: `${first_name || ""} ${last_name || ""}`.trim() || null,
           avatar: image_url || null,
         },
@@ -59,12 +67,20 @@ export async function POST(req: Request) {
     if (evt.type === "user.updated") {
       const { id, email_addresses, first_name, last_name, image_url } =
         evt.data;
+      const ensuredEmail =
+        email_addresses[0]?.email_address || `clerk_${id}@noemail.local`;
 
-      // Update user in database
-      await prisma.user.update({
+      // Update (or create) user in database
+      await prisma.user.upsert({
         where: { clerkId: id },
-        data: {
-          email: email_addresses[0]?.email_address || "",
+        create: {
+          clerkId: id,
+          email: ensuredEmail,
+          name: `${first_name || ""} ${last_name || ""}`.trim() || null,
+          avatar: image_url || null,
+        },
+        update: {
+          email: ensuredEmail,
           name: `${first_name || ""} ${last_name || ""}`.trim() || null,
           avatar: image_url || null,
         },
@@ -78,9 +94,7 @@ export async function POST(req: Request) {
 
       // Delete user from database
       if (id) {
-        await prisma.user.delete({
-          where: { clerkId: id },
-        });
+        await prisma.user.deleteMany({ where: { clerkId: id } });
         console.log(`User deleted: ${id}`);
       }
     }

@@ -70,6 +70,7 @@ model Sale {
   status            SaleStatus @default(PENDING)
   saleDate          DateTime @default(now())
   confirmedAt       DateTime?
+  paidAt            DateTime?
   createdAt         DateTime @default(now())
 }
 

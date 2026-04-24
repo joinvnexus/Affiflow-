@@ -18,9 +18,14 @@ export async function getCurrentUser() {
     clerkUser.emailAddresses[0]?.emailAddress ||
     "";
 
-  if (!user && email) {
+  // Email is required/unique in our DB schema. Some Clerk configurations may not
+  // provide an email (e.g. phone-only signups), so we fall back to a stable
+  // synthetic address to avoid unique constraint violations.
+  const ensuredEmail = email || `clerk_${clerkUser.id}@noemail.local`;
+
+  if (!user && ensuredEmail) {
     user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: ensuredEmail },
     });
 
     if (user) {
@@ -35,7 +40,7 @@ export async function getCurrentUser() {
     user = await prisma.user.create({
       data: {
         clerkId: clerkUser.id,
-        email,
+        email: ensuredEmail,
         name: clerkUser.fullName || clerkUser.firstName || "User",
       },
     });
