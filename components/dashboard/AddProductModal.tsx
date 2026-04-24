@@ -38,7 +38,7 @@ export function AddProductModal({ isOpen, onClose }: AddProductModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>("");
 
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<ProductForm>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<ProductForm>({
     resolver: zodResolver(productSchema),
   });
 

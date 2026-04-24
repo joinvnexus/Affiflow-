@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Copy, ExternalLink } from "lucide-react";
-import { prisma } from "@/lib/prisma";
 
 interface LinkData {
   id: string;
@@ -32,7 +31,7 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-export function AffiliateLinksOverview({ affiliateId, links }: AffiliateLinksOverviewProps) {
+export function AffiliateLinksOverview({ links }: AffiliateLinksOverviewProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const totalClicks = links.reduce((sum, link) => sum + link.clicks, 0);
